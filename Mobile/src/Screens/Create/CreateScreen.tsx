@@ -1,12 +1,19 @@
 import React, { FC, useRef, useState } from 'react';
-import { SafeAreaView, Text, TextInput } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TextInput } from 'react-native';
 // import Colours from 'Theme/Colours';
 // import { SubFont, SubFontBold, TitleFont } from 'Theme/Fonts';
 // import { Full } from 'Theme/Global';
 // import Icon from 'Components/Icon/Icon';
 // import Button from 'Components/Button/Button';
 // import useCreate from 'Hooks/useCreate';
-// import * as Styles from 'Components/Auth/Auth.styles';
+import * as Styles from 'Components/Authentication/Authentication.styles';
+import * as Atoms from 'Components/Authentication/Authentication.atoms';
+import { TitleFont } from 'Theme/Fonts';
+import Colours from 'Theme/Colours';
+import Icon from 'Components/Icon/Icon';
+import { useNavigation } from '@react-navigation/core';
+import { CreateNavProps } from 'Navigation/AuthNavigation/AuthNavigation.params';
+import useCreate from 'Hooks/useCreate';
 // import * as Atoms from 'Components/Auth/Auth.atoms';
 // import { useNavigation } from '@react-navigation/core';
 // import { CreateNavProps } from 'Navigation/AuthNavigation/AuthNavigation.params';
@@ -16,10 +23,71 @@ import { SafeAreaView, Text, TextInput } from 'react-native';
 // import SocialAuth from 'Components/SocialAuth/SocialAuth';
 
 const CreateScreen: FC = () => {
+	const emailRef = useRef<TextInput>(null);
+	const passwordRef = useRef<TextInput>(null);
+
+	const navigation = useNavigation<CreateNavProps>();
+	const [showPassword, setShowPassword] = useState(false);
+	const { loading, valid, handleChange, handleCreate } = useCreate();
+
 	return (
-		<SafeAreaView>
-			<Text>Create</Text>
-		</SafeAreaView>
+		<Styles.SafeContainer>
+			<ScrollView scrollEnabled={false} keyboardShouldPersistTaps="handled">
+				<Styles.Container>
+					<Styles.TitleContainer>
+						<Styles.TitleIcon family="fontawesome5" name="recycle" colour={Colours.secondary} size={26} />
+						<TitleFont colour={Colours.secondary}>binnit</TitleFont>
+					</Styles.TitleContainer>
+					<Styles.InputContainer>
+						<Styles.Input
+							placeholder="Name"
+							placeholderTextColor={Colours.Greys.GREY3}
+							returnKeyType="next"
+							blurOnSubmit={false}
+							onChangeText={e => handleChange(e, 'name')}
+							onSubmitEditing={() => emailRef.current?.focus()}
+						/>
+						<Styles.IconContainer>{valid.name && <Atoms.Check />}</Styles.IconContainer>
+					</Styles.InputContainer>
+					<Styles.InputContainer>
+						<Styles.Input
+							ref={emailRef}
+							placeholder="Email"
+							placeholderTextColor={Colours.Greys.GREY3}
+							keyboardType="email-address"
+							autoCapitalize="none"
+							returnKeyType="next"
+							blurOnSubmit={false}
+							onChangeText={e => handleChange(e, 'email')}
+							onSubmitEditing={() => passwordRef.current?.focus()}
+						/>
+						<Styles.IconContainer>{valid.email && <Atoms.Check />}</Styles.IconContainer>
+					</Styles.InputContainer>
+					<Styles.InputContainer>
+						<Styles.Input
+							ref={passwordRef}
+							placeholder="Password (6+ Characters)"
+							placeholderTextColor={Colours.Greys.GREY3}
+							returnKeyType="go"
+							secureTextEntry={!showPassword}
+							onChangeText={e => handleChange(e, 'password')}
+							onSubmitEditing={handleCreate}
+						/>
+						<Styles.IconContainer>
+							{valid.password && <Atoms.Check />}
+							<Atoms.Eye open={showPassword} onPress={() => setShowPassword(prev => !prev)} />
+						</Styles.IconContainer>
+					</Styles.InputContainer>
+
+					<Styles.AuthButton
+						text="Create Account"
+						fullWidth
+						onPress={handleCreate}
+						disabled={Object.values(valid).some(value => !value)}
+					/>
+				</Styles.Container>
+			</ScrollView>
+		</Styles.SafeContainer>
 	);
 	// const emailRef = useRef<TextInput>(null);
 	// const passwordRef = useRef<TextInput>(null);
