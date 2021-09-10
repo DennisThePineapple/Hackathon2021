@@ -9,7 +9,6 @@ const RootStack = createNativeStackNavigator<RootParams>();
 
 const RootNavigation: FC = () => {
 	const [user] = useUser();
-
 	return (
 		<RootStack.Navigator screenOptions={{ headerShown: false }}>
 			{user ? (

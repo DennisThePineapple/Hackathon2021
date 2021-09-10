@@ -1,32 +1,28 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppParams } from './AppNavigation.params';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TouchableOpacity } from 'react-native';
 import { useUser } from 'Context/AppContext';
 import Auth from 'Reducers/AuthReducer';
+import Scan from "../../Screens/Scan/Scan";
+import Profile from "../../Screens/Profile/Profile";
+import Home from "../../Screens/Home/Home";
 
-const AppStack = createNativeStackNavigator<AppParams>();
 
-const Test: FC = () => {
-	const [, dispatchUser] = useUser();
 
-	return (
-		<SafeAreaView>
-			<TouchableOpacity onPress={() => dispatchUser(Auth.actions.logout())}>
-				<Text>Logout</Text>
-			</TouchableOpacity>
-		</SafeAreaView>
-	);
-};
 
 const AppNavigation: FC = () => {
+	const Tab = createBottomTabNavigator<AppParams>();
 	return (
-		<AppStack.Navigator screenOptions={{ headerShown: false, presentation: 'modal' }}>
-			<AppStack.Screen name="Tabs" component={Test} />
-			<AppStack.Screen name="Scan" component={Test} />
-		</AppStack.Navigator>
+		<Tab.Navigator initialRouteName = "Home">
+			<Tab.Screen name="Scan" component={Scan} />
+			<Tab.Screen name="Home" component={Home} />
+			<Tab.Screen name="Profile" component={Profile} />
+		</Tab.Navigator>
 	);
 };
 
 export default AppNavigation;
+
