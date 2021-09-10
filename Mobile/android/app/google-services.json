@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1071518659446",
+    "project_id": "uqcs-hackathon-2021",
+    "storage_bucket": "uqcs-hackathon-2021.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071518659446:android:f99158b330f0728bd1c057",
+        "android_client_info": {
+          "package_name": "com.binnit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1071518659446-dg5d3hvdeb6c7ogc7ren36p6q1qb0c98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-YtcYs7MI4URpHBfqB3Ni9uhU2pzgACk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1071518659446-dg5d3hvdeb6c7ogc7ren36p6q1qb0c98.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
