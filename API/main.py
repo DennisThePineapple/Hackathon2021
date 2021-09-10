@@ -2,13 +2,12 @@
 import uvicorn
 from fastapi import FastAPI
 
-# # Modules
-# from core.config import settings
-# from api.v1.main import v1_router
+# Modules
+from routes import api
 
 # # Configure app
 app = FastAPI(title="Binnit")
-# app.include_router(v1_router)
+app.include_router(api.router)
 
 # Run app
 if __name__ == "__main__":
