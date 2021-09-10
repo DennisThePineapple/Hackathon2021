@@ -8,12 +8,13 @@ import { SafeAreaView, ScrollView, Text, TextInput } from 'react-native';
 // import useCreate from 'Hooks/useCreate';
 import * as Styles from 'Components/Authentication/Authentication.styles';
 import * as Atoms from 'Components/Authentication/Authentication.atoms';
-import { TitleFont } from 'Theme/Fonts';
+import { SubFont, SubFontBold, TitleFont } from 'Theme/Fonts';
 import Colours from 'Theme/Colours';
 import Icon from 'Components/Icon/Icon';
 import { useNavigation } from '@react-navigation/core';
 import { CreateNavProps } from 'Navigation/AuthNavigation/AuthNavigation.params';
 import useCreate from 'Hooks/useCreate';
+import { Full } from 'Theme/Global';
 // import * as Atoms from 'Components/Auth/Auth.atoms';
 // import { useNavigation } from '@react-navigation/core';
 // import { CreateNavProps } from 'Navigation/AuthNavigation/AuthNavigation.params';
@@ -31,8 +32,8 @@ const CreateScreen: FC = () => {
 	const { loading, valid, handleChange, handleCreate } = useCreate();
 
 	return (
-		<Styles.SafeContainer>
-			<ScrollView scrollEnabled={false} keyboardShouldPersistTaps="handled">
+		<SafeAreaView style={Full}>
+			<ScrollView scrollEnabled={false} keyboardShouldPersistTaps="handled" contentContainerStyle={Full}>
 				<Styles.Container>
 					<Styles.TitleContainer>
 						<Styles.TitleIcon family="fontawesome5" name="recycle" colour={Colours.secondary} size={26} />
@@ -82,12 +83,18 @@ const CreateScreen: FC = () => {
 					<Styles.AuthButton
 						text="Create Account"
 						fullWidth
+						bold
 						onPress={handleCreate}
 						disabled={Object.values(valid).some(value => !value)}
 					/>
+
+					<Styles.LoginButton onPress={() => navigation.navigate('Login')}>
+						<SubFont>Already have an account? </SubFont>
+						<SubFontBold>Login</SubFontBold>
+					</Styles.LoginButton>
 				</Styles.Container>
 			</ScrollView>
-		</Styles.SafeContainer>
+		</SafeAreaView>
 	);
 	// const emailRef = useRef<TextInput>(null);
 	// const passwordRef = useRef<TextInput>(null);

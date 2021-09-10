@@ -3,15 +3,16 @@ import Colours from './Colours';
 
 interface FontProps {
 	colour?: string;
+	bold?: boolean;
 }
 
 export const fontFamily = 'Comfortaa';
 export const fontWeight = '600';
 export const fontHeaderFamily = 'Comfortaa';
-export const fontHeaderWeight = '800';
+export const fontHeaderWeight = '900';
 
 export const BodyFont = styled.Text<FontProps>`
-	font-weight: ${fontWeight};
+	font-weight: ${({ bold }) => (bold ? fontHeaderWeight : fontWeight)};
 	font-family: ${fontFamily};
 	font-size: 18px;
 	color: ${props => props.colour ?? Colours.primary};
@@ -25,9 +26,11 @@ export const TitleFont = styled.Text<FontProps>`
 `;
 
 export const SubFont = styled(BodyFont)`
+	color: ${Colours.Greys.GREY0};
 	font-size: 14px;
 `;
 
 export const SubFontBold = styled(SubFont)`
-	font-weight: 600;
+	color: ${Colours.Greys.GREY0};
+	font-weight: 900;
 `;

@@ -1,18 +1,19 @@
-import styled, { css } from '@emotion/native';
+import styled from '@emotion/native';
 import Button from 'Components/Button/Button';
 import Icon from 'Components/Icon/Icon';
 import Colours from 'Theme/Colours';
-import { fontFamily, fontWeight, TitleFont } from 'Theme/Fonts';
-
-export const SafeContainer = styled.SafeAreaView`
-	flex: 1;
-	background-color: ${Colours.primary};
-`;
+import { fontFamily, fontWeight } from 'Theme/Fonts';
 
 export const Container = styled.View`
 	flex: 1;
 	align-items: center;
 	padding: 20px;
+`;
+
+export const BackContainer = styled.View`
+	position: absolute;
+	left: 15px;
+	top: 15px;
 `;
 
 /* -------------------------------------------------------------------------- */
@@ -21,7 +22,7 @@ export const Container = styled.View`
 export const TitleContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
-	margin: 50px;
+	margin: 60px;
 `;
 
 export const TitleIcon = styled(Icon)`
@@ -63,4 +64,11 @@ export const IconContainer = styled.View`
 /* -------------------------------------------------------------------------- */
 export const AuthButton = styled(Button)`
 	margin-top: 20px;
+`;
+
+export const LoginButton = styled.TouchableOpacity`
+	padding: 10px;
+	margin-top: auto;
+	flex-direction: row;
+	align-items: center;
 `;

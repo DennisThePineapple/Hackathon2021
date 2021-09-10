@@ -7,10 +7,11 @@ import * as Styles from './Button.styles';
 
 interface ButtonProps extends TouchableOpacityProps {
 	text: string;
+	bold?: boolean;
 	fullWidth?: boolean;
 }
 
-const Button: FC<ButtonProps> = ({ text, fullWidth, ...rest }) => {
+const Button: FC<ButtonProps> = ({ text, fullWidth, bold, ...rest }) => {
 	return (
 		<Styles.Base fullWidth={fullWidth} {...rest}>
 			<LinearGradient
@@ -19,7 +20,9 @@ const Button: FC<ButtonProps> = ({ text, fullWidth, ...rest }) => {
 				start={{ x: 0.3, y: 0 }}
 				end={{ x: 1, y: 0 }}
 			/>
-			<BodyFont colour={Colours.primary}>{text}</BodyFont>
+			<BodyFont bold={bold} colour={Colours.primary}>
+				{text}
+			</BodyFont>
 		</Styles.Base>
 	);
 };

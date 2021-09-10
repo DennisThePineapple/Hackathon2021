@@ -27,7 +27,7 @@ export const Back: FC = () => {
 	const navigation = useNavigation();
 	return (
 		<TouchableOpacity onPress={() => navigation.goBack()}>
-			<Icon family="feather" name={'chevron-left'} size={30} colour={Colours.primary} />
+			<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.secondary} />
 		</TouchableOpacity>
 	);
 };
