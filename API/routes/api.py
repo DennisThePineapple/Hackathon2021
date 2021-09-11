@@ -32,10 +32,11 @@ POINTS = {
 # compute recyclable materials and points in pytorch model
 # store results in db and send down points breakdown objects
 # param userId should be the generated id from firebase auth
+# submit form data to this endpoint, not http request body attributes
 
 
 @router.post('/submit')
-async def test(file: UploadFile = File(...), userId: str = Form(...)):
+async def submit(file: UploadFile = File(...), userId: str = Form(...)):
     # replace RHS with real model inference invocation e.g. `materials = InferMaterials(file)``
     materials = {
         # material : occurrences
@@ -83,5 +84,5 @@ async def test(file: UploadFile = File(...), userId: str = Form(...)):
 
 
 @ router.get('/leaderboards')
-async def test():
+async def leaderboards():
     return "leaderboards endpoint"
