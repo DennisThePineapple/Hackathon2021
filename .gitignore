@@ -141,4 +141,9 @@ dist
 \*.py[cod]
 
 # Firebase Auth
+
 auth.json
+
+# Model weights
+
+weights.pt
