@@ -39,7 +39,9 @@ POINTS = {
 @router.post('/submit')
 async def submit(file: bytes = Form(...), userId: str = Form(...), username: str = Form(...)):
 
-    material_coords = await predict(file, userId)
+    image = BytesIO(base64.b64decode(file)).read()
+
+    material_coords = await predict(image, userId)
 
     # this is a simplified version of the array above
     # containing only the material and the number of occurrences
