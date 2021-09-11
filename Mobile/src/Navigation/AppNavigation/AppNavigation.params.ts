@@ -12,12 +12,16 @@
 // export type NoticesNavProps = NativeStackNavigationProp<AppParams, 'Profile'>;
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import ImageSummaryData from "../../Types/ImageSummaryData";
 
 export type AppParams = {
 	Tabs: undefined;
 	Scan: undefined;
 	Info: undefined;
-	'Scan Summary': {imageUri : string};
+	'Scan Summary': {
+		imageUri : string,
+		imageData : ImageSummaryData
+	};
 };
 
 // App Navigation Types

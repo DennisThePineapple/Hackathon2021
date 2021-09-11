@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import {Button, SafeAreaView, Text} from 'react-native';
-import Userscore from '../../Types/Userscore';
+import Userscores from '../../Types/Userscores';
 import { DataTable } from 'react-native-paper';
 import {getRecPoints, getWastePoints} from "../../Utils/Points";
 
@@ -11,7 +11,7 @@ type scoreTableProps = {
 // Tf is this lmao
 const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableProps) => {
 	const [loading, setLoading] = useState(true);
-	const [scoreData, setScoreData] = useState(new Array<Userscore>());
+	const [scoreData, setScoreData] = useState<Userscores>([]);
 	const [page, setPage] = React.useState<number>(0);
 	const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
 	const url = 'http://192.168.0.37:5000/api/leaderboards?past_days=' + props.time;
@@ -39,14 +39,13 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 
 	const userScores = () => {
 		let index = 1;
-		const test = Object.keys(scoreData);
-		return Object.keys(scoreData).map(username => (
+		return scoreData.map(userData => (
 			<DataTable.Row key = {index}>
 				<DataTable.Cell numeric>{index++}</DataTable.Cell>
-				<DataTable.Cell>{username}</DataTable.Cell>
-				<DataTable.Cell numeric>{scoreData[username].total}</DataTable.Cell>
-				<DataTable.Cell numeric>{getRecPoints(scoreData[username])}</DataTable.Cell>
-				<DataTable.Cell numeric>{getWastePoints(scoreData[username])}</DataTable.Cell>
+				<DataTable.Cell>{userData[0]}</DataTable.Cell>
+				<DataTable.Cell numeric>{userData[1].total}</DataTable.Cell>
+				<DataTable.Cell numeric>{getRecPoints(userData)}</DataTable.Cell>
+				<DataTable.Cell numeric>{getWastePoints(userData[1].materials)}</DataTable.Cell>
 			</DataTable.Row>
 		));
 	};

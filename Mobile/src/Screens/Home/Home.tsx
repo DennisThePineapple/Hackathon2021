@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Button, SafeAreaView, Text } from 'react-native';
 import { DataTable } from 'react-native-paper';
-import Userscore from '../../Types/Userscore';
+import Userscores from '../../Types/Userscores';
 import ScoresTable from './ScoresTable';
 
 const Home: FC = () => {

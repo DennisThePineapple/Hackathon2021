@@ -1,17 +1,9 @@
-import Material from "./Material";
+import Materials from "./Materials";
 
-type Userscore = {
-    [id : string] : {
-        materials: {
-            paper?: Material,
-            metal?: Material,
-            cardboard?: Material,
-            glass?: Material,
-            plastic?: Material,
-            organic?: Material,
-        },
-        total: number
-    }
-};
+type Userscore = [string, {
+    materials : Materials,
+    total : number
+}]
+
 
 export default Userscore;

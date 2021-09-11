@@ -13,13 +13,16 @@ const Scan: FC = () => {
 	const navigation = useNavigation<ScanNavProps>();
 	const [user] = useUser();
 	const [loading, setLoading] = useState(false);
+
 	let camera : RNCamera | null;
 	const takePicture = async () => {
 		if (camera) {
 			const options = { quality: 0.5, base64: true };
 			setLoading(true);
 			const imageData = await camera.takePictureAsync(options);
-			navigation.navigate("Scan Summary", {imageUri : imageData.uri});
+			navigation.navigate("Scan Summary", {
+				imageUri : imageData.uri,
+			});
 		}
 	};
 	const url = "http://192.168.0.37:5000/api/submit"
