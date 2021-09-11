@@ -76,7 +76,7 @@ async def submit(file: bytes = Form(...), userId: str = Form(...), username: str
 
             material_score_breakdown[material] = {
                 'occurrence': occurrence,
-                'points': points,
+                'points': points * occurrence,
             }
 
             total_points = total_points + points
