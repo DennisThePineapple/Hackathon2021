@@ -36,7 +36,7 @@ POINTS = {
 
 
 @router.post('/submit')
-async def submit(file: UploadFile = File(...), userId: str = Form(...)):
+async def submit(file: UploadFile = File(...), userId: str = Form(...), username: str = Form(...)):
     # replace RHS with real model inference invocation e.g. `materials = InferMaterials(file)``
     materials = {
         # material : occurrences
@@ -57,6 +57,7 @@ async def submit(file: UploadFile = File(...), userId: str = Form(...)):
 
     item_data = dict()
     item_data['userId'] = userId
+    item_data['username'] = username
     item_data['date'] = date
 
     for item in materials.items():
@@ -84,5 +85,42 @@ async def submit(file: UploadFile = File(...), userId: str = Form(...)):
 
 
 @ router.get('/leaderboards')
-async def leaderboards():
-    return "leaderboards endpoint"
+async def leaderboards(past_days=7):
+
+    leaderboards = dict()
+
+    today = datetime.date.today()
+
+    # wrap in int because if the request parameter is set it will default to a string
+    since = today - datetime.timedelta(int(past_days))
+
+    # convert datetime object into firebase timestamp object
+    timestamp = datetime.datetime.combine(
+        since, datetime.datetime.min.time()
+    )
+
+    items = db.collection('items').where('date', '>', timestamp).stream()
+
+    for item in items:
+        item = item.to_dict()
+        username = item['username']
+        points = item['points']
+        material = item['material']
+
+        if username in leaderboards:
+            if material in leaderboards[username]:
+                leaderboards[username]['materials'][material]['points'] += points
+                leaderboards[username]['materials'][material]['occurrence'] += 1
+            else:
+                leaderboards[username]['materials'][material] = {}
+                leaderboards[username]['materials'][material]['points'] = points
+                leaderboards[username]['materials'][material]['occurrence'] = 1
+            leaderboards[username]['total'] += points
+        else:
+            leaderboards[username] = {'materials': {}, 'total': 0}
+            leaderboards[username]['materials'][material] = {}
+            leaderboards[username]['materials'][material]['points'] = points
+            leaderboards[username]['materials'][material]['occurrence'] = 1
+            leaderboards[username]['total'] += points
+
+    return leaderboards
