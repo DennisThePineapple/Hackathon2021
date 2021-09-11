@@ -77,11 +77,11 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 					numberOfPages={3}
 					onPageChange={page => setPage(page)}
 					label="1-2 of 6"
-					optionsPerPage={optionsPerPage}
-					itemsPerPage={itemsPerPage}
-					setItemsPerPage={setItemsPerPage}
-					showFastPagination
-					optionsLabel={'Rows per page'}
+					// optionsPerPage={optionsPerPage}
+					// itemsPerPage={itemsPerPage}
+					// setItemsPerPage={setItemsPerPage}
+					// showFastPagination
+					// optionsLabel={'Rows per page'}
 				/>
 			</DataTable>
 		</SafeAreaView>
