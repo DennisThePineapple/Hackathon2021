@@ -11,6 +11,7 @@ import {Modal} from "react-native-paper";
 import MaterialBox from "../../Types/MaterialBox";
 import {TakePictureResponse} from "react-native-camera";
 import {useUser} from "../../Context/AppContext";
+import {recyclable} from "../../Utils/Points";
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -52,7 +53,16 @@ const ScanSummary: (route: RouteProp<{ params: { imageUri: string, image: string
 
 				return imageData ?imageData.material_box_coordinates.map((boxData:MaterialBox) => {
 					console.log(boxData);
-					return <View key = {index++} style={{backgroundColor: 'blue',position: 'absolute', top: windowHeight*boxData.y1, left: windowWidth*boxData.x1, right: windowWidth-windowWidth*boxData.x2, bottom: windowHeight-windowHeight*boxData.y2, justifyContent: 'center', alignItems: 'center'}}>
+					return <View key = {index++} style={{
+						backgroundColor: recyclable.includes(boxData.class) ? 'yellow':'red',
+						position: 'absolute',
+						top: windowHeight*boxData.y1,
+						left: windowWidth*boxData.x1,
+						right: windowWidth-windowWidth*boxData.x2,
+						bottom: windowHeight-windowHeight*boxData.y2,
+						justifyContent: 'center',
+						alignItems: 'center',
+						opacity: 0.5}} >
 						<Text>{boxData.class}</Text>
 					</View>
 				}) : <View/>;
@@ -63,6 +73,8 @@ const ScanSummary: (route: RouteProp<{ params: { imageUri: string, image: string
 	}
 	const renderModal = () => {
 	}
+
+
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
