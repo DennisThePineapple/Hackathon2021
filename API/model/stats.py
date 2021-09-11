@@ -6,6 +6,7 @@ class StatResponse(BaseModel):
     materials: AllMaterials
 
 class StatsResponse(BaseModel):
+    week: StatResponse
     month: StatResponse
     year: StatResponse
-    all_time: StatResponse
+    allTime: StatResponse

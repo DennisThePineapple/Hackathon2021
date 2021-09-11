@@ -39,7 +39,7 @@ export const InputContainer = styled.View`
 	padding: 0px 20px;
 	border-radius: 10px;
 	margin-bottom: 20px;
-	background-color: ${Colours.Greys.GREY0};
+	background-color: ${Colours.accent};
 `;
 
 export const Input = styled.TextInput`

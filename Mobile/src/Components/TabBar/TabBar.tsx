@@ -14,11 +14,11 @@ const TabBar: FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
 
 	return (
 		<Styles.Container>
-			<Styles.IconButton onPress={() => navigation.navigate('Leaderboard')} disabled={state.index === 0}>
+			<Styles.IconButton onPress={() => navigation.navigate('Profile')} disabled={state.index === 0}>
 				<Styles.IconContainer>
 					<Icon
 						family="feather"
-						name="award"
+						name="user"
 						size={35}
 						colour={state.index === 0 ? Colours.secondary : Colours.primary}
 					/>
@@ -36,11 +36,11 @@ const TabBar: FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
 					<Icon family="fontawesome5" name="recycle" size={35} colour={Colours.primary} />
 				</Styles.AddButton>
 			</Styles.AddContainer>
-			<Styles.IconButton onPress={() => navigation.navigate('Profile')} disabled={state.index === 1}>
+			<Styles.IconButton onPress={() => navigation.navigate('Leaderboard')} disabled={state.index === 1}>
 				<Styles.IconContainer>
 					<Icon
 						family="feather"
-						name="user"
+						name="award"
 						size={35}
 						colour={state.index === 1 ? Colours.secondary : Colours.primary}
 					/>

@@ -15,7 +15,7 @@ export const BodyFont = styled.Text<FontProps>`
 	font-weight: ${({ bold }) => (bold ? fontHeaderWeight : fontWeight)};
 	font-family: ${fontFamily};
 	font-size: 18px;
-	color: ${props => props.colour ?? Colours.primary};
+	color: ${props => props.colour ?? Colours.accent};
 `;
 
 export const TitleFont = styled.Text<FontProps>`
@@ -26,11 +26,9 @@ export const TitleFont = styled.Text<FontProps>`
 `;
 
 export const SubFont = styled(BodyFont)`
-	color: ${Colours.Greys.GREY0};
 	font-size: 14px;
 `;
 
 export const SubFontBold = styled(SubFont)`
-	color: ${Colours.Greys.GREY0};
 	font-weight: 900;
 `;

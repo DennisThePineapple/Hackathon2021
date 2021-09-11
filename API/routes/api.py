@@ -107,9 +107,11 @@ async def getStats(userId: str):
     all_items = {'materials': {}, 'total': 0}
     year_items = {'materials': {}, 'total': 0}
     month_items = {'materials': {}, 'total': 0}
+    week_items = {'materials': {}, 'total': 0}
 
-    since_month = datetime.now() - timedelta(days=30.5)
     since_year = datetime.now() - timedelta(days=365)
+    since_month = datetime.now() - timedelta(days=30.5)
+    since_week = datetime.now() - timedelta(days=7)
 
     items = db.collection('items').where('userId', '==', userId).stream()
 
@@ -119,6 +121,10 @@ async def getStats(userId: str):
 
         # Desctructure values
         material, date = itemgetter('material', 'date')(item)
+
+        # Update monthly stats
+        if date.replace(tzinfo=None) > since_week:
+            update_stats_breakdown(material, week_items)
 
         # Update monthly stats
         if date.replace(tzinfo=None) > since_month:
@@ -132,7 +138,8 @@ async def getStats(userId: str):
         update_stats_breakdown(material, all_items)
 
     return {
-        'all_time': all_items,
+        'allTime': all_items,
         'year': year_items,
-        'month': month_items
+        'month': month_items,
+        'week': week_items
     }

@@ -5,7 +5,7 @@ export const Container = styled.View`
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
-	background-color: ${Colours.Greys.GREY0};
+	background-color: ${Colours.accent};
 	padding-bottom: 20px;
 	border-radius: 20px 20px 0px 0px;
 `;

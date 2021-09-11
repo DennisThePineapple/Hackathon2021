@@ -6,6 +6,6 @@ export const Theme: NavTheme = {
 	colors: {
 		...DefaultTheme.colors,
 		background: Colours.primary,
-		text: Colours.Greys.GREY0,
+		text: Colours.accent,
 	},
 };

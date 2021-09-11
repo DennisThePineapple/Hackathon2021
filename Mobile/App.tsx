@@ -10,7 +10,7 @@ import { Theme } from 'Theme/Theme';
 const App: FC = () => {
 	return (
 		<AppContextProvider>
-			<StatusBar barStyle="light-content" />
+			<StatusBar barStyle="dark-content" />
 			<NavigationContainer theme={Theme}>
 				<RootNavigation />
 			</NavigationContainer>
