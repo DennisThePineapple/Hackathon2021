@@ -200,10 +200,15 @@ async def getStats(userId):
     today = datetime.date.today()
 
     # wrap in int because if the request parameter is set it will default to a string
+    since_week = today - datetime.timedelta(int(7))
     since_month = today - datetime.timedelta(int(30.5))
     since_year = today - datetime.timedelta(int(365))
 
     # convert datetime object into firebase timestamp object
+    past_week_timestamp = datetime.datetime.combine(
+        since_week, datetime.datetime.min.time()
+    )
+
     past_month_timestamp = datetime.datetime.combine(
         since_month, datetime.datetime.min.time()
     )
@@ -216,17 +221,21 @@ async def getStats(userId):
         'userId', '==', str(userId))
 
     all_items = all_items_query.stream()
+    past_week_items = all_items_query.where(
+        'date', '>', past_week_timestamp).stream()
     past_month_items = all_items_query.where(
         'date', '>', past_month_timestamp).stream()
     past_year_items = all_items_query.where(
         'date', '>', past_year_timestamp).stream()
 
     all_time_stat_breakdown = getStatBreakDown(all_items)
+    past_week_stat_breakdown = getStatBreakDown(past_week_items)
     past_month_stat_breakdown = getStatBreakDown(past_month_items)
     past_year_stat_breakdown = getStatBreakDown(past_year_items)
 
     user_info = {
         **{'all_time_stat_breakdown': all_time_stat_breakdown},
+        **{'all_week_stat_breakdown': past_week_stat_breakdown},
         **{'past_month_stat_breakdown': past_month_stat_breakdown},
         **{'past_year_stat_breakdown': past_year_stat_breakdown},
     }
