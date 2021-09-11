@@ -1,3 +1,6 @@
+from model.inference import Inference
+from PIL import Image
+from io import BytesIO
 from fastapi import APIRouter, File, Form, UploadFile
 
 import datetime
@@ -125,3 +128,32 @@ async def leaderboards(past_days=7):
         leaderboards.items(), key=lambda x: x[1]['total'], reverse=True)
 
     return sorted_leaderboards
+
+# Set up model inferencing
+model = Inference()
+
+CLASSES = {0: "metal", 1: "cardboard"}
+
+# Returns an array from the model predictions containing the class name
+
+
+def get_class_array(tensor_array):
+    class_array = tensor_array[:5] + [CLASSES[tensor_array[5]]]
+    return class_array
+
+
+@router.post("/predict")
+async def predict(file: bytes = File(...), userId: str = Form(...)):
+    # Open the image as PIL
+    image = Image.open(BytesIO(file))
+
+    # Run model on the image
+    results = model.predict(image)
+
+    # Format results
+    format_results = [
+        dict(zip(["x1", "y1", "x2", "y2", "conf", "class"], get_class_array(i)))
+        for i in results.xyxyn[0].tolist()
+    ]
+
+    return format_results
