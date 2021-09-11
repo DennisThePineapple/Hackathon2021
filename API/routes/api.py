@@ -37,20 +37,21 @@ POINTS = {
 
 
 @router.post('/submit')
-async def submit(file: UploadFile = File(...), userId: str = Form(...), username: str = Form(...)):
-    # replace RHS with real model inference invocation e.g. `materials = InferMaterials(file)``
-    materials = {
-        # material : occurrences
-        'plastic': 1,
-        'paper': 1,
-        'metal': 1,
-        'cardboard': 0,
-        'organic': 0,
-        'glass': 0,
-        'waste': 0
-    }
+async def submit(file: bytes = File(...), userId: str = Form(...), username: str = Form(...)):
+    material_coords = await predict(file, userId)
 
-    material_breakdown = dict()
+    # this is a simplified version of the array above
+    # containing only the material and the number of occurrences
+    materials = dict()
+
+    for data in material_coords:
+        material = data["class"]
+        if material in materials:
+            materials[material] += 1
+        else:
+            materials[material] = 1
+
+    material_score_breakdown = dict()
 
     total_points = 0
 
@@ -70,7 +71,7 @@ async def submit(file: UploadFile = File(...), userId: str = Form(...), username
             item_data['material'] = material
             item_data['points'] = points
 
-            material_breakdown[material] = {
+            material_score_breakdown[material] = {
                 'occurrence': occurrence,
                 'points': points,
             }
@@ -82,7 +83,7 @@ async def submit(file: UploadFile = File(...), userId: str = Form(...), username
 
     # ** is used to compose dictionaries
     # https://www.python.org/dev/peps/pep-0448/
-    return {**material_breakdown, **{'total_points': total_points}}
+    return {**{'material_score_breakdown': material_score_breakdown}, **{'total_points': total_points}, **{'material_box_coordinates': material_coords}}
 
 
 @ router.get('/leaderboards')
