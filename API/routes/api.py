@@ -37,7 +37,7 @@ POINTS = {
 
 
 @router.post('/submit')
-async def submit(file: str = Form(...), userId: str = Form(...), username: str = Form(...)):
+async def submit(file: bytes = Form(...), userId: str = Form(...), username: str = Form(...)):
 
     image = BytesIO(base64.b64decode(file)).read()
 
@@ -114,13 +114,14 @@ async def leaderboards(past_days=7):
     for item in items:
         item = item.to_dict()
         username = item['username']
+        print(username, item)
         points = item['points']
         material = item['material']
 
         if username in leaderboards:
-            if material in leaderboards[username]:
+            if material in leaderboards[username]['materials']:
                 leaderboards[username]['materials'][material]['points'] += points
-                leaderboards[username]['materials'][material]['occurrence'] += 1
+                leaderboards[username]['materials'][material]['occurrence'] = 3
             else:
                 leaderboards[username]['materials'][material] = {}
                 leaderboards[username]['materials'][material]['points'] = points
@@ -186,9 +187,9 @@ async def getStats(userId):
             points = item['points']
             material = item['material']
 
-            if material in obj:
+            if material in obj['materials']:
                 obj['materials'][material]['points'] += points
-                obj['materials'][material]['occurrence'] += 1
+                obj['materials'][material]['occurrence'] = obj['materials'][material]['occurrence'] + 1
             else:
                 obj['materials'][material] = {}
                 obj['materials'][material]['points'] = points
