@@ -37,7 +37,7 @@ const Scan: FC = () => {
 	const capture = useCallback(async () => {
 		if (user && cameraRef.current) {
 			try {
-				const data = await cameraRef.current.takePictureAsync();
+				const data = await cameraRef.current.takePictureAsync({ quality: 0.1 });
 				setUri(data.uri);
 				const _result = await API.submit(data.uri, user.uid, user.displayName);
 				setResult(_result);
