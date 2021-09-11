@@ -14,7 +14,7 @@ const Scan: FC = () => {
 	const navigation = useNavigation<ScanNavProps>();
 	const [user] = useUser();
 	const [loading, setLoading] = useState(false);
-	const [imageBoxes, setimageBoxes] = useState<ImageSummaryData>();
+	const [imageBoxes, setImageBoxes] = useState<ImageSummaryData | null>(null);
 	let camera : RNCamera | null;
 	const takePicture = async () => {
 		if (camera) {
@@ -22,22 +22,30 @@ const Scan: FC = () => {
 			setLoading(true);
 			const imageData = await camera.takePictureAsync(options);
 			await fetchBoxes(imageData);
-			if (!loading){
-				navigation.navigate("Scan Summary", {
-					imageUri : imageData.uri,
-					imageData : imageBoxes
-				});
+			const waitForData = () => {
+				console.log("Waiting for Data");
+				if(imageData){
+					navigation.navigate("Scan Summary", {
+						imageUri : imageData.uri,
+						imageData : imageBoxes
+					});
+				}
+				else{
+					setTimeout(waitForData, 250);
+				}
 			}
+			waitForData();
+
 		}
 	};
 	const url = "http://192.168.0.37:5000/api/submit"
-	const fetchBoxes = (imageData : TakePictureResponse) => {
+	const fetchBoxes = async (imageData : TakePictureResponse) => {
 		const formData = new FormData();
 		formData.append("file", imageData.base64);
 		formData.append("userId", user?.uid);
 		formData.append("username", user?.displayName);
 
-		fetch(url, {
+		await fetch(url, {
 			method: 'POST',
 			headers: {
 				'Accept' : 'application/json',
@@ -47,8 +55,7 @@ const Scan: FC = () => {
 		})
 			.then(response => response.json())
 			.then(result => {
-				console.log(result);
-				setimageBoxes(result);
+				setImageBoxes(result);
 				setLoading(false);
 			})
 			.catch(error => {
