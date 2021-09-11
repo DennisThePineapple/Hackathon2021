@@ -69,7 +69,7 @@ async def submit(file: bytes = Form(...), userId: str = Form(...), username: str
         (material, occurrence) = item
         if (occurrence > 0):
             # calculate points by multiplying number of item with point per material type
-            points = occurrence * POINTS.get(material)
+            points = POINTS.get(material)
 
             item_data['material'] = material
             item_data['points'] = points
@@ -121,7 +121,7 @@ async def leaderboards(past_days=7):
         if username in leaderboards:
             if material in leaderboards[username]['materials']:
                 leaderboards[username]['materials'][material]['points'] += points
-                leaderboards[username]['materials'][material]['occurrence'] = 3
+                leaderboards[username]['materials'][material]['occurrence'] += 1
             else:
                 leaderboards[username]['materials'][material] = {}
                 leaderboards[username]['materials'][material]['points'] = points
