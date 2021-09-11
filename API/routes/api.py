@@ -3,12 +3,11 @@ from PIL import Image
 from io import BytesIO
 from fastapi import APIRouter, File, Form, UploadFile
 
-import datetime
+# import datetime
 
 # Firebase
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import firestore, credentials
 import base64
 router = APIRouter(prefix='/api', tags=['api'])
 
@@ -89,22 +88,22 @@ async def submit(file: str = Form(...), userId: str = Form(...), username: str =
     return {**{'material_score_breakdown': material_score_breakdown}, **{'total_points': total_points}, **{'material_box_coordinates': material_coords}}
 
 
-@ router.get('/leaderboards')
-async def leaderboards(past_days=7):
+from datetime import datetime, timedelta
+
+@router.get('/leaderboards')
+async def leaderboards(past_days: int = 7):
 
     leaderboards = dict()
 
-    today = datetime.date.today()
+    # Comparator to retrieve items up to a given timestamp
+    since = datetime.now() + timedelta(days=-past_days)
 
-    # wrap in int because if the request parameter is set it will default to a string
-    since = today - datetime.timedelta(int(past_days))
+    # Get all items matching the date comparitor 
+    items = db.collection('items').where('date', '>', since).stream()
 
-    # convert datetime object into firebase timestamp object
-    timestamp = datetime.datetime.combine(
-        since, datetime.datetime.min.time()
-    )
-
-    items = db.collection('items').where('date', '>', timestamp).stream()
+    # for item in items:
+    #     item = item.to_dict()
+    #     print(item)
 
     for item in items:
         item = item.to_dict()
