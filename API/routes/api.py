@@ -133,7 +133,15 @@ async def leaderboards(past_days=7):
 # Set up model inferencing
 model = Inference()
 
-CLASSES = {0: "metal", 1: "cardboard"}
+CLASSES = {
+    0: "plastic", 
+    1: "paper",
+    2: "metal",
+    3: "cardboard",
+    4: "organic",
+    5: "glass",
+    6: "waste"
+}
 
 # Returns an array from the model predictions containing the class name
 
