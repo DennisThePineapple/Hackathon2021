@@ -25,4 +25,5 @@ export const LogoutButton = styled.TouchableOpacity`
 
 export const TableContainer = styled.View`
 	margin: 20px 0px;
+	flex: 1;
 `;

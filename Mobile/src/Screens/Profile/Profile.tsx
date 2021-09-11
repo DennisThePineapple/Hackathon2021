@@ -32,36 +32,36 @@ const Profile: FC = () => {
 
 	return (
 		<Styles.Container>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				<Styles.FontContainer>
-					<Styles.Font>Welcome back {user?.displayName}!</Styles.Font>
-					<Styles.Font>
-						You've earned <BodyFont colour={Colours.secondary}>{currentStats?.total}</BodyFont> points{' '}
-						{timeTextMap[timeMap[timeIndex]]}. Keep it up! Every little bit helps
-					</Styles.Font>
-				</Styles.FontContainer>
+			<Styles.FontContainer>
+				<Styles.Font>Welcome back {user?.displayName}!</Styles.Font>
+				<Styles.Font>
+					You've earned <BodyFont colour={Colours.secondary}>{currentStats?.total}</BodyFont> points{' '}
+					{timeTextMap[timeMap[timeIndex]]}. Keep it up! Every little bit helps
+				</Styles.Font>
+			</Styles.FontContainer>
 
-				<SegmentedControl
-					tintColor={Colours.accent}
-					backgroundColor={Colours.primary}
-					values={['Week', 'Month', 'Year', 'Total']}
-					selectedIndex={timeIndex}
-					fontStyle={{ fontFamily: fontFamily, color: Colours.accent }}
-					onChange={e => setTimeIndex(e.nativeEvent.selectedSegmentIndex)}
-				/>
+			<SegmentedControl
+				tintColor={Colours.accent}
+				backgroundColor={Colours.primary}
+				values={['Week', 'Month', 'Year', 'Total']}
+				selectedIndex={timeIndex}
+				fontStyle={{ fontFamily: fontFamily, color: Colours.accent }}
+				onChange={e => setTimeIndex(e.nativeEvent.selectedSegmentIndex)}
+			/>
 
-				<Styles.TableContainer>
-					<TabelRow header>
-						<TableCell flex={2}>
-							<BodyFont colour={Colours.primary}>Material</BodyFont>
-						</TableCell>
-						<TableCell flex={1.5} align="center">
-							<BodyFont colour={Colours.primary}>Tally</BodyFont>
-						</TableCell>
-						<TableCell flex={1.5} align="center">
-							<BodyFont colour={Colours.primary}>Score</BodyFont>
-						</TableCell>
-					</TabelRow>
+			<Styles.TableContainer>
+				<TabelRow header>
+					<TableCell flex={2}>
+						<BodyFont colour={Colours.primary}>Material</BodyFont>
+					</TableCell>
+					<TableCell flex={1.5} align="center">
+						<BodyFont colour={Colours.primary}>Tally</BodyFont>
+					</TableCell>
+					<TableCell flex={1.5} align="center">
+						<BodyFont colour={Colours.primary}>Score</BodyFont>
+					</TableCell>
+				</TabelRow>
+				<ScrollView showsVerticalScrollIndicator={false}>
 					{currentStats &&
 						Object.entries(currentStats.materials).map(([material, values]: [string, Material | null]) => (
 							<TabelRow key={material}>
@@ -76,8 +76,8 @@ const Profile: FC = () => {
 								</TableCell>
 							</TabelRow>
 						))}
-				</Styles.TableContainer>
-			</ScrollView>
+				</ScrollView>
+			</Styles.TableContainer>
 		</Styles.Container>
 	);
 };
