@@ -93,5 +93,10 @@
 		<string>Comfortaa-Regular.ttf</string>
 		<string>Comfortaa-SemiBold.ttf</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+    <string>Sheeeeesh u lookin to ligma?</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Binnit uses your camera to scan your rubbish</string>
+   
 </dict>
 </plist>

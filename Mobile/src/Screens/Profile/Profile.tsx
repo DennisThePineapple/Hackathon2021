@@ -1,12 +1,17 @@
-import React, {FC} from "react";
-import {SafeAreaView, Text} from "react-native";
+import { useUser } from 'Context/AppContext';
+import React, { FC } from 'react';
+import { SafeAreaView, Text, TouchableOpacity } from 'react-native';
+import Auth from 'Reducers/AuthReducer';
 
 const Profile: FC = () => {
-    return (
-        <SafeAreaView>
-            <Text>Profile</Text>
-        </SafeAreaView>
-    );
-}
+	const [, dispatchUser] = useUser();
+	return (
+		<SafeAreaView>
+			<TouchableOpacity onPress={() => dispatchUser(Auth.actions.logout())}>
+				<Text>Logout</Text>
+			</TouchableOpacity>
+		</SafeAreaView>
+	);
+};
 
 export default Profile;
