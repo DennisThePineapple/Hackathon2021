@@ -5,15 +5,15 @@ import Userscore from '../../Types/Userscore';
 import ScoresTable from './ScoresTable';
 
 const Home: FC = () => {
-	const [period, setPeriod] = useState('day');
+	const [period, setPeriod] = useState('1');
 	const handleSetYear = () => {
-		setPeriod('year');
+		setPeriod('365');
 	};
 	const handleSetMonth = () => {
-		setPeriod('month');
+		setPeriod('30');
 	};
 	const handleSetDay = () => {
-		setPeriod('day');
+		setPeriod('1');
 	};
 	return (
 		<SafeAreaView>

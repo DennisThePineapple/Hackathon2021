@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
-import { SafeAreaView, Text } from 'react-native';
+import {Button, SafeAreaView, Text} from 'react-native';
 import Userscore from '../../Types/Userscore';
 import { DataTable } from 'react-native-paper';
+import {getRecPoints, getWastePoints} from "../../Utils/Points";
 
 const optionsPerPage = [2, 3, 4];
 type scoreTableProps = {
@@ -13,38 +14,46 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 	const [scoreData, setScoreData] = useState(new Array<Userscore>());
 	const [page, setPage] = React.useState<number>(0);
 	const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
-	const url = 'api/scores/' + props.time;
-	useEffect(() => {
+	const url = 'http://192.168.0.37:5000/api/leaderboards?days=' + props.time;
+	const fetchData = () => {
 		fetch(url, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
+				Accept: "application/json"
 			},
 		})
 			.then(response => response.json())
 			.then(scoreData => {
 				setScoreData(scoreData);
 				setLoading(false);
+			})
+			.catch(error => {
+				console.log(error);
 			});
-		setScoreData([]);
+	}
+	useEffect(() => {
+		console.log("Loading score data");
+		fetchData();
 	}, []);
 
 	const userScores = () => {
 		let index = 1;
-		return scoreData.map(userScore => (
-			<DataTable.Row>
+		const test = Object.keys(scoreData);
+		return Object.keys(scoreData).map(username => (
+			<DataTable.Row key = {index}>
 				<DataTable.Cell numeric>{index++}</DataTable.Cell>
-				<DataTable.Cell>{userScore.username}</DataTable.Cell>
-				<DataTable.Cell numeric>{userScore.wasteScore + userScore.recycleScore}</DataTable.Cell>
-				<DataTable.Cell numeric>{userScore.recycleScore}</DataTable.Cell>
-				<DataTable.Cell numeric>{userScore.wasteScore}</DataTable.Cell>
+				<DataTable.Cell>{username}</DataTable.Cell>
+				<DataTable.Cell numeric>{scoreData[username].total}</DataTable.Cell>
+				<DataTable.Cell numeric>{getRecPoints(scoreData[username])}</DataTable.Cell>
+				<DataTable.Cell numeric>{getWastePoints(scoreData[username])}</DataTable.Cell>
 			</DataTable.Row>
 		));
 	};
 	return (
-		// Todo: add loading anime
-		//         loading? <SafeAreaView/>:
+
 		<SafeAreaView>
+			<Button title="Refresh" onPress={fetchData} />
 			<DataTable>
 				<DataTable.Header>
 					<DataTable.Title numeric>Ranking</DataTable.Title>
@@ -54,23 +63,7 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 					<DataTable.Title numeric>Waste Points</DataTable.Title>
 				</DataTable.Header>
 
-				{userScores()}
-
-				<DataTable.Row>
-					<DataTable.Cell numeric>1</DataTable.Cell>
-					<DataTable.Cell>Lad</DataTable.Cell>
-					<DataTable.Cell numeric>1</DataTable.Cell>
-					<DataTable.Cell numeric>2</DataTable.Cell>
-					<DataTable.Cell numeric>55</DataTable.Cell>
-				</DataTable.Row>
-
-				<DataTable.Row>
-					<DataTable.Cell numeric>1</DataTable.Cell>
-					<DataTable.Cell>Lad</DataTable.Cell>
-					<DataTable.Cell numeric>1</DataTable.Cell>
-					<DataTable.Cell numeric>2</DataTable.Cell>
-					<DataTable.Cell numeric>55</DataTable.Cell>
-				</DataTable.Row>
+				{loading? <SafeAreaView/>: userScores()}
 
 				<DataTable.Pagination
 					page={page}
