@@ -31,6 +31,7 @@ POINTS = {
 # receive a photo and userId
 # compute recyclable materials and points in pytorch model
 # store results in db and send down points breakdown objects
+# param userId should be the generated id from firebase auth
 
 
 @router.post('/submit')
@@ -47,9 +48,9 @@ async def test(file: UploadFile = File(...), userId: str = Form(...)):
         'waste': 0
     }
 
-    points_breakdown = {
-        'total_points': 0
-    }
+    material_breakdown = dict()
+
+    total_points = 0
 
     date = datetime.datetime.now()
 
@@ -66,17 +67,19 @@ async def test(file: UploadFile = File(...), userId: str = Form(...)):
             item_data['material'] = material
             item_data['points'] = points
 
-            points_breakdown[material] = {
+            material_breakdown[material] = {
                 'occurrence': occurrence,
                 'points': points,
             }
 
-            points_breakdown['total_points'] = points_breakdown['total_points'] + points
+            total_points = total_points + points
 
             # db.collection(...).add(...) auto-generates a unique id for the insert
             db.collection("items").add(item_data)
 
-    return points_breakdown
+    # ** is used to compose dictionaries
+    # https://www.python.org/dev/peps/pep-0448/
+    return {**material_breakdown, **{'total_points': total_points}}
 
 
 @ router.get('/leaderboards')
