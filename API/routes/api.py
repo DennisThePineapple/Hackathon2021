@@ -9,7 +9,7 @@ import datetime
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-
+import base64
 router = APIRouter(prefix='/api', tags=['api'])
 
 # Use a service account
@@ -37,8 +37,11 @@ POINTS = {
 
 
 @router.post('/submit')
-async def submit(file: bytes = File(...), userId: str = Form(...), username: str = Form(...)):
-    material_coords = await predict(file, userId)
+async def submit(file: str = Form(...), userId: str = Form(...), username: str = Form(...)):
+
+    image = BytesIO(base64.b64decode(file)).read()
+
+    material_coords = await predict(image, userId)
 
     # this is a simplified version of the array above
     # containing only the material and the number of occurrences

@@ -18,7 +18,7 @@ const Scan: FC = () => {
 	let camera : RNCamera | null;
 	const takePicture = async () => {
 		if (camera) {
-			const options = { quality: 1, base64: true };
+			const options = { quality: 0.1, base64: true };
 			setLoading(true);
 			const imageData = await camera.takePictureAsync(options);
 			await fetchBoxes(imageData);
@@ -32,16 +32,18 @@ const Scan: FC = () => {
 	};
 	const url = "http://192.168.0.37:5000/api/submit"
 	const fetchBoxes = (imageData : TakePictureResponse) => {
+		const formData = new FormData();
+		formData.append("file", imageData.base64);
+		formData.append("userId", user?.uid);
+		formData.append("username", user?.displayName);
+
 		fetch(url, {
 			method: 'POST',
 			headers: {
+				'Accept' : 'application/json',
 				'Content-Type': 'multipart/form-data',
 			},
-			body: JSON.stringify({
-				file: imageData.base64,
-				userId: user?.uid,
-				username: user?.displayName
-			})
+			body: formData
 		})
 			.then(response => response.json())
 			.then(result => {
