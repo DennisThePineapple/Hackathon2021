@@ -8,21 +8,26 @@ import Colours from 'Theme/Colours';
 
 import * as Styles from './Scan.styles';
 import {useUser} from "../../Context/AppContext";
+import ImageSummaryData from "../../Types/ImageSummaryData";
 
 const Scan: FC = () => {
 	const navigation = useNavigation<ScanNavProps>();
 	const [user] = useUser();
 	const [loading, setLoading] = useState(false);
-
+	const [imageBoxes, setimageBoxes] = useState<ImageSummaryData>();
 	let camera : RNCamera | null;
 	const takePicture = async () => {
 		if (camera) {
-			const options = { quality: 0.5, base64: true };
+			const options = { quality: 1, base64: true };
 			setLoading(true);
 			const imageData = await camera.takePictureAsync(options);
-			navigation.navigate("Scan Summary", {
-				imageUri : imageData.uri,
-			});
+			await fetchBoxes(imageData);
+			if (!loading){
+				navigation.navigate("Scan Summary", {
+					imageUri : imageData.uri,
+					imageData : imageBoxes
+				});
+			}
 		}
 	};
 	const url = "http://192.168.0.37:5000/api/submit"
@@ -30,8 +35,7 @@ const Scan: FC = () => {
 		fetch(url, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
-				Accept: "application/json"
+				'Content-Type': 'multipart/form-data',
 			},
 			body: JSON.stringify({
 				file: imageData.base64,
@@ -40,8 +44,9 @@ const Scan: FC = () => {
 			})
 		})
 			.then(response => response.json())
-			.then(scoreData => {
-				setScoreData(scoreData);
+			.then(result => {
+				console.log(result);
+				setimageBoxes(result);
 				setLoading(false);
 			})
 			.catch(error => {
