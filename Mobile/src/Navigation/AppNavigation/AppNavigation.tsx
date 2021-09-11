@@ -10,6 +10,7 @@ import Scan from 'Screens/Scan/Scan';
 import Profile from 'Screens/Profile/Profile';
 import Home from 'Screens/Home/Home';
 import TabNavigation from 'Navigation/TabNavigation/TabNavigation';
+import ScanSummary from "../../Screens/ScanSummary/ScanSummary";
 
 // const Tab = createBottomTabNavigator<AppParams>();
 
@@ -20,6 +21,10 @@ const AppNavigation: FC = () => {
 		<AppStack.Navigator screenOptions={{ headerShown: false, presentation: 'fullScreenModal' }}>
 			<AppStack.Screen name="Tabs" component={TabNavigation} />
 			<AppStack.Screen name="Scan" component={Scan} />
+			<AppStack.Screen name="Scan Summary"
+							 component={ScanSummary}
+							 initialParams={{ imageUri: "" }}
+			/>
 		</AppStack.Navigator>
 	);
 };

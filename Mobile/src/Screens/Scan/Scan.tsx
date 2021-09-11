@@ -1,19 +1,56 @@
 import { useNavigation } from '@react-navigation/core';
 import Icon from 'Components/Icon/Icon';
 import { ScanNavProps } from 'Navigation/AppNavigation/AppNavigation.params';
-import React, { FC } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import React, {FC, useState} from 'react';
+import {SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {RNCamera, TakePictureResponse} from 'react-native-camera';
 import Colours from 'Theme/Colours';
 
 import * as Styles from './Scan.styles';
+import {useUser} from "../../Context/AppContext";
 
 const Scan: FC = () => {
 	const navigation = useNavigation<ScanNavProps>();
-	// console.log(RNCamera.Constants.CameraStatus);
+	const [user] = useUser();
+	const [loading, setLoading] = useState(false);
+	let camera : RNCamera | null;
+	const takePicture = async () => {
+		if (camera) {
+			const options = { quality: 0.5, base64: true };
+			setLoading(true);
+			const imageData = await camera.takePictureAsync(options);
+			navigation.navigate("Scan Summary", {imageUri : imageData.uri});
+		}
+	};
+	const url = "http://192.168.0.37:5000/api/submit"
+	const fetchBoxes = (imageData : TakePictureResponse) => {
+		fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: "application/json"
+			},
+			body: JSON.stringify({
+				file: imageData.base64,
+				userId: user?.uid,
+				username: user?.displayName
+			})
+		})
+			.then(response => response.json())
+			.then(scoreData => {
+				setScoreData(scoreData);
+				setLoading(false);
+			})
+			.catch(error => {
+				console.log(error);
+			});
+	}
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			<RNCamera
+				ref={ref => {
+					camera = ref;
+				}}
 				style={StyleSheet.absoluteFill}
 				captureAudio={false}
 				androidCameraPermissionOptions={{
@@ -35,6 +72,11 @@ const Scan: FC = () => {
 						<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.secondary} />
 					</Styles.BackButton>
 				</Styles.BackContainer>
+			</View>
+			<View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+				<TouchableOpacity onPress={takePicture}>
+					<Text> SNAP </Text>
+				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
 	);

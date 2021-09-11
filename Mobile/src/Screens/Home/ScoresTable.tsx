@@ -14,7 +14,7 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 	const [scoreData, setScoreData] = useState(new Array<Userscore>());
 	const [page, setPage] = React.useState<number>(0);
 	const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
-	const url = 'http://192.168.0.37:5000/api/leaderboards?days=' + props.time;
+	const url = 'http://192.168.0.37:5000/api/leaderboards?past_days=' + props.time;
 	const fetchData = () => {
 		fetch(url, {
 			method: 'GET',
