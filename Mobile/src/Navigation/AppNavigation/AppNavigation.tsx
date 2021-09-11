@@ -6,23 +6,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TouchableOpacity } from 'react-native';
 import { useUser } from 'Context/AppContext';
 import Auth from 'Reducers/AuthReducer';
-import Scan from "../../Screens/Scan/Scan";
-import Profile from "../../Screens/Profile/Profile";
-import Home from "../../Screens/Home/Home";
+import Scan from 'Screens/Scan/Scan';
+import Profile from 'Screens/Profile/Profile';
+import Home from 'Screens/Home/Home';
+import TabNavigation from 'Navigation/TabNavigation/TabNavigation';
 
+// const Tab = createBottomTabNavigator<AppParams>();
 
-
+const AppStack = createNativeStackNavigator<AppParams>();
 
 const AppNavigation: FC = () => {
-	const Tab = createBottomTabNavigator<AppParams>();
 	return (
-		<Tab.Navigator initialRouteName = "Home">
-			<Tab.Screen name="Scan" component={Scan} />
-			<Tab.Screen name="Home" component={Home} />
-			<Tab.Screen name="Profile" component={Profile} />
-		</Tab.Navigator>
+		<AppStack.Navigator screenOptions={{ headerShown: false, presentation: 'fullScreenModal' }}>
+			<AppStack.Screen name="Tabs" component={TabNavigation} />
+			<AppStack.Screen name="Scan" component={Scan} />
+		</AppStack.Navigator>
 	);
 };
 
 export default AppNavigation;
-
