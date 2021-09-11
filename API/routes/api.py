@@ -17,6 +17,17 @@ firebase_admin.initialize_app(credentials)
 
 db = firestore.client()
 
+# how many points should each material be?
+POINTS = {
+    'plastic': 1,
+    'paper': 1,
+    'metal': 1,
+    'cardboard': 1,
+    'organic': 1,
+    'glass': 1,
+    'waste': 1
+}
+
 # receive a photo and userId
 # compute recyclable materials and points in pytorch model
 # store results in db and send down points breakdown objects
@@ -26,9 +37,18 @@ db = firestore.client()
 async def test(file: UploadFile = File(...), userId: str = Form(...)):
     # replace RHS with real model inference invocation e.g. `materials = InferMaterials(file)``
     materials = {
+        # material : occurrences
         'plastic': 1,
-        'paper': 2,
-        'metal': 3
+        'paper': 1,
+        'metal': 1,
+        'cardboard': 0,
+        'organic': 0,
+        'glass': 0,
+        'waste': 0
+    }
+
+    points_breakdown = {
+        'total_points': 0
     }
 
     date = datetime.datetime.now()
@@ -38,14 +58,25 @@ async def test(file: UploadFile = File(...), userId: str = Form(...)):
     item_data['date'] = date
 
     for item in materials.items():
-        (material, points) = item
-        item_data['material'] = material
-        item_data['points'] = points
+        (material, occurrence) = item
+        if (occurrence > 0):
+            # calculate points by multiplying number of item with point per material type
+            points = occurrence * POINTS.get(material)
 
-        # db.collection(...).add(...) auto-generates a unique id for the insert
-        await db.collection("items").add(item_data)
+            item_data['material'] = material
+            item_data['points'] = points
 
-    return materials
+            points_breakdown[material] = {
+                'occurrence': occurrence,
+                'points': points,
+            }
+
+            points_breakdown['total_points'] = points_breakdown['total_points'] + points
+
+            # db.collection(...).add(...) auto-generates a unique id for the insert
+            db.collection("items").add(item_data)
+
+    return points_breakdown
 
 
 @ router.get('/leaderboards')
