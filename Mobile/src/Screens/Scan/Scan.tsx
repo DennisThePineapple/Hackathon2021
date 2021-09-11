@@ -12,56 +12,24 @@ import ImageSummaryData from "../../Types/ImageSummaryData";
 
 const Scan: FC = () => {
 	const navigation = useNavigation<ScanNavProps>();
-	const [user] = useUser();
 	const [loading, setLoading] = useState(false);
-	const [imageBoxes, setImageBoxes] = useState<ImageSummaryData | null>(null);
 	let camera : RNCamera | null;
 	const takePicture = async () => {
 		if (camera) {
-			const options = { quality: 0.1, base64: true };
+			const options = { quality: 1, base64: true };
 			setLoading(true);
 			const imageData = await camera.takePictureAsync(options);
-			await fetchBoxes(imageData);
-			const waitForData = () => {
-				console.log("Waiting for Data");
-				if(imageData){
-					navigation.navigate("Scan Summary", {
-						imageUri : imageData.uri,
-						imageData : imageBoxes
-					});
-				}
-				else{
-					setTimeout(waitForData, 250);
-				}
+
+			navigation.navigate("Scan Summary", {
+				imageUri : imageData.uri,
+				image : imageData.base64
+				});
 			}
-			waitForData();
 
-		}
-	};
-	const url = "http://192.168.0.37:5000/api/submit"
-	const fetchBoxes = async (imageData : TakePictureResponse) => {
-		const formData = new FormData();
-		formData.append("file", imageData.base64);
-		formData.append("userId", user?.uid);
-		formData.append("username", user?.displayName);
 
-		await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Accept' : 'application/json',
-				'Content-Type': 'multipart/form-data',
-			},
-			body: formData
-		})
-			.then(response => response.json())
-			.then(result => {
-				setImageBoxes(result);
-				setLoading(false);
-			})
-			.catch(error => {
-				console.log(error);
-			});
-	}
+		};
+
+
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			<RNCamera
