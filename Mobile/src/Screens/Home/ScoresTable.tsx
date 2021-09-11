@@ -1,8 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
-import {Button, SafeAreaView, Text} from 'react-native';
+import { Button, SafeAreaView, Text } from 'react-native';
 import Userscores from '../../Types/Userscores';
 import { DataTable } from 'react-native-paper';
-import {getRecPoints, getWastePoints} from "../../Utils/Points";
+import { getRecPoints, getWastePoints } from '../../Utils/Points';
+import Config from 'react-native-config';
 
 const optionsPerPage = [2, 3, 4];
 type scoreTableProps = {
@@ -14,33 +15,36 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 	const [scoreData, setScoreData] = useState<Userscores>([]);
 	const [page, setPage] = React.useState<number>(0);
 	const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
-	const url = 'http://192.168.0.37:5000/api/leaderboards?past_days=' + props.time;
+	const url = `http://${Config.API_HOST}:5000/api/leaderboards?past_days=` + props.time;
+
+	console.log(Config.API_HOST);
+
 	const fetchData = () => {
 		fetch(url, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				Accept: "application/json"
+				Accept: 'application/json',
 			},
 		})
 			.then(response => response.json())
 			.then(scoreData => {
 				setScoreData(scoreData);
 				setLoading(false);
-			})
-			.catch(error => {
-				console.log(error);
 			});
-	}
+		// .catch(error => {
+		// 	console.log(error);
+		// });
+	};
 	useEffect(() => {
-		console.log("Loading score data");
+		console.log('Loading score data');
 		fetchData();
 	}, []);
 
 	const userScores = () => {
 		let index = 1;
 		return scoreData.map(userData => (
-			<DataTable.Row key = {index}>
+			<DataTable.Row key={index}>
 				<DataTable.Cell numeric>{index++}</DataTable.Cell>
 				<DataTable.Cell>{userData[0]}</DataTable.Cell>
 				<DataTable.Cell numeric>{userData[1].total}</DataTable.Cell>
@@ -50,7 +54,6 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 		));
 	};
 	return (
-
 		<SafeAreaView>
 			<Button title="Refresh" onPress={fetchData} />
 			<DataTable>
@@ -62,7 +65,7 @@ const ScoresTable: (props: scoreTableProps) => JSX.Element = (props: scoreTableP
 					<DataTable.Title numeric>Waste Points</DataTable.Title>
 				</DataTable.Header>
 
-				{loading? <SafeAreaView/>: userScores()}
+				{loading ? <SafeAreaView /> : userScores()}
 
 				<DataTable.Pagination
 					page={page}

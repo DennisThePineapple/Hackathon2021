@@ -1,3 +1,4 @@
+import API from 'API/API';
 import React, { FC, useEffect, useState } from 'react';
 import { Button, SafeAreaView, Text } from 'react-native';
 import { DataTable } from 'react-native-paper';
@@ -5,6 +6,12 @@ import Userscores from '../../Types/Userscores';
 import ScoresTable from './ScoresTable';
 
 const Home: FC = () => {
+	useEffect(() => {
+		(async () => {
+			await API.leaderboards(1);
+		})();
+	}, []);
+
 	const [period, setPeriod] = useState('1');
 	const handleSetYear = () => {
 		setPeriod('365');
@@ -21,7 +28,7 @@ const Home: FC = () => {
 			<Button title="Yearly" onPress={handleSetYear} />
 			<Button title="Monthly" onPress={handleSetMonth} />
 			<Button title="Daily" onPress={handleSetDay} />
-			<ScoresTable time={period} />
+			{/* <ScoresTable time={period} /> */}
 		</SafeAreaView>
 	);
 };

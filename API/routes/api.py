@@ -1,170 +1,138 @@
-from model.inference import Inference
+from typing import Dict, List, NewType, Type
 from PIL import Image
 from io import BytesIO
-from fastapi import APIRouter, File, Form, UploadFile
+from fastapi import APIRouter, File, Form
+from datetime import datetime, timedelta, date, tzinfo
+from operator import itemgetter
+from ml.inference import Inference
+from model.material import Points
+from model.stats import StatsResponse
+from model.submit import SubmitResponse
+from model.leaderboard import LeaderBoardUser
+from helpers.stats import update_stats_breakdown
+from helpers.leaderboard import create_leaderboard_user, update_leaderboard_user
+from helpers.submit import get_class_array, update_material_breakdown
+from firebase_admin import firestore, credentials, initialize_app
 
-# import datetime
-
-# Firebase
-import firebase_admin
-from firebase_admin import firestore, credentials
-import base64
+# Setup router
 router = APIRouter(prefix='/api', tags=['api'])
 
-# Use a service account
-credentials = credentials.Certificate('./auth.json')
-firebase_admin.initialize_app(credentials)
+# Set up model inferencing
+model = Inference()
 
+# Setup firestore
+credentials = credentials.Certificate('./auth.json')
+initialize_app(credentials)
 db = firestore.client()
 
-# how many points should each material be?
-POINTS = {
-    'plastic': 1,
-    'paper': 1,
-    'metal': 1,
-    'cardboard': 1,
-    'organic': 1,
-    'glass': 1,
-    'waste': 1
-}
 
 # receive a photo and userId
 # compute recyclable materials and points in pytorch model
 # store results in db and send down points breakdown objects
 # param userId should be the generated id from firebase auth
 # submit form data to this endpoint, not http request body attributes
-
-
-@router.post('/submit')
-async def submit(file: str = Form(...), userId: str = Form(...), username: str = Form(...)):
-
-    image = BytesIO(base64.b64decode(file)).read()
-
-    material_coords = await predict(image, userId)
-
-    # this is a simplified version of the array above
-    # containing only the material and the number of occurrences
-    materials = dict()
-
-    for data in material_coords:
-        material = data["class"]
-        if material in materials:
-            materials[material] += 1
-        else:
-            materials[material] = 1
-
-    material_score_breakdown = dict()
-
+@router.post('/submit', response_model=SubmitResponse)
+async def submit(file: bytes = File(...), userId: str = Form(...), username: str = Form(...)):
+    # Mutable structs
+    material_breakdown = dict()
     total_points = 0
 
-    date = datetime.datetime.now()
-
-    item_data = dict()
-    item_data['userId'] = userId
-    item_data['username'] = username
-    item_data['date'] = date
-
-    for item in materials.items():
-        (material, occurrence) = item
-        if (occurrence > 0):
-            # calculate points by multiplying number of item with point per material type
-            points = occurrence * POINTS.get(material)
-
-            item_data['material'] = material
-            item_data['points'] = points
-
-            material_score_breakdown[material] = {
-                'occurrence': occurrence,
-                'points': points,
-            }
-
-            total_points = total_points + points
-
-            # db.collection(...).add(...) auto-generates a unique id for the insert
-            db.collection("items").add(item_data)
-
-    # ** is used to compose dictionaries
-    # https://www.python.org/dev/peps/pep-0448/
-    return {**{'material_score_breakdown': material_score_breakdown}, **{'total_points': total_points}, **{'material_box_coordinates': material_coords}}
-
-
-from datetime import datetime, timedelta
-
-@router.get('/leaderboards')
-async def leaderboards(past_days: int = 7):
-
-    leaderboards = dict()
-
-    # Comparator to retrieve items up to a given timestamp
-    since = datetime.now() + timedelta(days=-past_days)
-
-    # Get all items matching the date comparitor 
-    items = db.collection('items').where('date', '>', since).stream()
-
-    # for item in items:
-    #     item = item.to_dict()
-    #     print(item)
-
-    for item in items:
-        item = item.to_dict()
-        username = item['username']
-        points = item['points']
-        material = item['material']
-
-        if username in leaderboards:
-            if material in leaderboards[username]:
-                leaderboards[username]['materials'][material]['points'] += points
-                leaderboards[username]['materials'][material]['occurrence'] += 1
-            else:
-                leaderboards[username]['materials'][material] = {}
-                leaderboards[username]['materials'][material]['points'] = points
-                leaderboards[username]['materials'][material]['occurrence'] = 1
-            leaderboards[username]['total'] += points
-        else:
-            leaderboards[username] = {'materials': {}, 'total': 0}
-            leaderboards[username]['materials'][material] = {}
-            leaderboards[username]['materials'][material]['points'] = points
-            leaderboards[username]['materials'][material]['occurrence'] = 1
-            leaderboards[username]['total'] += points
-
-    sorted_leaderboards = sorted(
-        leaderboards.items(), key=lambda x: x[1]['total'], reverse=True)
-
-    return sorted_leaderboards
-
-# Set up model inferencing
-model = Inference()
-
-CLASSES = {
-    0: "plastic", 
-    1: "paper",
-    2: "metal",
-    3: "cardboard",
-    4: "organic",
-    5: "glass",
-    6: "waste"
-}
-
-# Returns an array from the model predictions containing the class name
-
-
-def get_class_array(tensor_array):
-    class_array = tensor_array[:5] + [CLASSES[tensor_array[5]]]
-    return class_array
-
-
-@router.post("/predict")
-async def predict(file: bytes = File(...), userId: str = Form(...)):
     # Open the image as PIL
     image = Image.open(BytesIO(file))
 
     # Run model on the image
     results = model.predict(image)
 
-    # Format results
-    format_results = [
-        dict(zip(["x1", "y1", "x2", "y2", "conf", "class"], get_class_array(i)))
+    # Get bounding box dictionary
+    boundings = [
+        dict(zip(["x1", "y1", "x2", "y2", "conf", "material"], get_class_array(i)))
         for i in results.xyxyn[0].tolist()
     ]
 
-    return format_results
+    # For each entry in the dictionary...
+    for bounding in boundings:
+        # Increment the total points
+        total_points += Points[bounding['material']].value
+        # Update the material breakdown dictionary
+        update_material_breakdown(bounding['material'], material_breakdown)
+
+        # Save the item to the database
+        db.collection("items").add({
+            'userId': userId, 
+            'username': username,
+            'date': datetime.now(),
+            'material': bounding['material']
+        })
+
+    # Return the structured data
+    return {
+        'total': total_points,
+        'breakdown': material_breakdown,
+        'boundings': boundings
+    }
+
+
+@router.get('/leaderboards', response_model=List[LeaderBoardUser])
+async def leaderboards(past_days: int = 7):
+    # Leaderboard dictionary
+    leaderboard = dict()
+
+    # Comparator to retrieve items up to a given timestamp
+    since = datetime.now() - timedelta(days=past_days)
+
+    # Get all items matching the date comparitor 
+    items = db.collection('items').where('date', '>', since).stream()
+
+    # For each item in the collection...
+    for item in items:
+        item = item.to_dict()
+
+        # Desctructure values
+        userId, userName, material = itemgetter('userId', 'username', 'material')(item)
+
+        # If the user is already in the leaderboard, update their leaderboard entry
+        if userId in leaderboard:
+            update_leaderboard_user(userId, material, leaderboard)
+        # Otherwise, create a new leaderboard entry for them
+        else:
+            leaderboard[userId] = create_leaderboard_user(userName, material)
+
+    # Return the list, sorted by the users total points
+    return sorted(list(leaderboard.values()), key=lambda user: user['totalPoints'], reverse=True)
+
+
+@router.get("/user_stats", response_model=StatsResponse)
+async def getStats(userId: str):
+
+    all_items = {'materials': {}, 'total': 0}
+    year_items = {'materials': {}, 'total': 0}
+    month_items = {'materials': {}, 'total': 0}
+
+    since_month = datetime.now() - timedelta(days=30.5)
+    since_year = datetime.now() - timedelta(days=365)
+
+    items = db.collection('items').where('userId', '==', userId).stream()
+
+    # For each item in the collection...
+    for item in items:
+        item = item.to_dict()
+
+        # Desctructure values
+        material, date = itemgetter('material', 'date')(item)
+
+        # Update monthly stats
+        if date.replace(tzinfo=None) > since_month:
+            update_stats_breakdown(material, month_items)
+
+        # Update yearly stats
+        if date.replace(tzinfo=None) > since_year:
+            update_stats_breakdown(material, year_items)
+
+        # Update all time stats
+        update_stats_breakdown(material, all_items)
+
+    return {
+        'all_time': all_items,
+        'year': year_items,
+        'month': month_items
+    }
