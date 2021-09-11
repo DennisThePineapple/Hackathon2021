@@ -17,9 +17,11 @@ export type AppParams = {
 	Tabs: undefined;
 	Scan: undefined;
 	Info: undefined;
+	'Scan Summary': {imageUri : string};
 };
 
 // App Navigation Types
 export type TabNavProps = NativeStackNavigationProp<AppParams, 'Tabs'>;
 export type ScanNavProps = NativeStackNavigationProp<AppParams, 'Scan'>;
+export type ScanSummaryNavProps = NativeStackNavigationProp<AppParams, 'Scan Summary'>;
 export type InfoNavProps = NativeStackNavigationProp<AppParams, 'Info'>;
