@@ -24,18 +24,11 @@ const windowHeight = Dimensions.get('window').height;
 const ScanSummary: (route: RouteProp<{ params: { imageUri: string, imageData: ImageSummaryData } }, 'params'>) =>
 	JSX.Element = (route: RouteProp<{ params: { imageUri: string, imageData: ImageSummaryData} }, 'params'>) => {
 	const navigation = useNavigation<ScanSummaryNavProps>();
-	console.log(route);
 	const imageData = route.route.params.imageData;
 	const imageUri = route.route.params.imageUri;
-	console.log(imageData.material_box_coordinates);
-	console.log(windowHeight)
-	console.log(windowWidth)
-
 	const renderBoxes = () => {
 		let index = 0;
 		return imageData.material_box_coordinates.map((boxData:MaterialBox) => {
-			console.log(boxData);
-			console.log(index);
 			return <View key = {index++} style={{backgroundColor: 'blue',position: 'absolute', top: windowHeight*boxData.y1, left: windowWidth*boxData.x1, right: windowWidth-windowWidth*boxData.x2, bottom: windowHeight-windowHeight*boxData.y2, justifyContent: 'center', alignItems: 'center'}}>
 				<Text>{boxData.class}</Text>
 			</View>
