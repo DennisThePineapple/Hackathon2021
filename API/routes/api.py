@@ -39,9 +39,7 @@ POINTS = {
 @router.post('/submit')
 async def submit(file: bytes = Form(...), userId: str = Form(...), username: str = Form(...)):
 
-    image = BytesIO(base64.b64decode(file)).read()
-
-    material_coords = await predict(image, userId)
+    material_coords = await predict(file, userId)
 
     # this is a simplified version of the array above
     # containing only the material and the number of occurrences
@@ -72,14 +70,13 @@ async def submit(file: bytes = Form(...), userId: str = Form(...), username: str
             points = POINTS.get(material)
 
             item_data['material'] = material
-            item_data['points'] = points
 
             material_score_breakdown[material] = {
                 'occurrence': occurrence,
                 'points': points * occurrence,
             }
 
-            total_points = total_points + points
+            total_points = total_points + (points * occurrence)
 
             # db.collection(...).add(...) auto-generates a unique id for the insert
             db.collection("items").add(item_data)
