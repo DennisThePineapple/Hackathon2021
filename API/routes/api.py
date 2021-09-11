@@ -86,7 +86,12 @@ async def submit(file: str = Form(...), userId: str = Form(...), username: str =
 
     # ** is used to compose dictionaries
     # https://www.python.org/dev/peps/pep-0448/
-    return {**{'material_score_breakdown': material_score_breakdown}, **{'total_points': total_points}, **{'material_box_coordinates': material_coords}}
+    breakdown = {
+        **{'material_score_breakdown': material_score_breakdown},
+        **{'total_points': total_points},
+        **{'material_box_coordinates': material_coords}}
+
+    return breakdown
 
 
 @ router.get('/leaderboards')
@@ -137,7 +142,7 @@ async def leaderboards(past_days=7):
 model = Inference()
 
 CLASSES = {
-    0: "plastic", 
+    0: "plastic",
     1: "paper",
     2: "metal",
     3: "cardboard",
@@ -169,3 +174,61 @@ async def predict(file: bytes = File(...), userId: str = Form(...)):
     ]
 
     return format_results
+
+
+@router.get("/user_stats")
+async def getStats(userId):
+    def getStatBreakDown(items):
+        obj = {'materials': {}, 'total': 0}
+
+        for item in items:
+            item = item.to_dict()
+            points = item['points']
+            material = item['material']
+
+            if material in obj:
+                obj['materials'][material]['points'] += points
+                obj['materials'][material]['occurrence'] += 1
+            else:
+                obj['materials'][material] = {}
+                obj['materials'][material]['points'] = points
+                obj['materials'][material]['occurrence'] = 1
+            obj['total'] += points
+
+        return obj
+
+    today = datetime.date.today()
+
+    # wrap in int because if the request parameter is set it will default to a string
+    since_month = today - datetime.timedelta(int(30.5))
+    since_year = today - datetime.timedelta(int(365))
+
+    # convert datetime object into firebase timestamp object
+    past_month_timestamp = datetime.datetime.combine(
+        since_month, datetime.datetime.min.time()
+    )
+    past_year_timestamp = datetime.datetime.combine(
+        since_year, datetime.datetime.min.time()
+    )
+
+    # saves us from querying 3 times : )
+    all_items_query = db.collection('items').where(
+        'userId', '==', str(userId))
+
+    all_items = all_items_query.stream()
+    past_month_items = all_items_query.where(
+        'date', '>', past_month_timestamp).stream()
+    past_year_items = all_items_query.where(
+        'date', '>', past_year_timestamp).stream()
+
+    all_time_stat_breakdown = getStatBreakDown(all_items)
+    past_month_stat_breakdown = getStatBreakDown(past_month_items)
+    past_year_stat_breakdown = getStatBreakDown(past_year_items)
+
+    user_info = {
+        **{'all_time_stat_breakdown': all_time_stat_breakdown},
+        **{'past_month_stat_breakdown': past_month_stat_breakdown},
+        **{'past_year_stat_breakdown': past_year_stat_breakdown},
+    }
+
+    return user_info
