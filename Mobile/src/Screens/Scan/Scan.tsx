@@ -59,8 +59,21 @@ const Scan: FC = () => {
 				</Styles.BackContainer>
 			</View>
 			<View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-				<TouchableOpacity onPress={takePicture}>
-					<Text> SNAP </Text>
+				<TouchableOpacity
+					style={{
+						bottom:20,
+						borderWidth:1,
+						borderColor:'rgba(0,0,0,0.2)',
+						alignItems:'center',
+						justifyContent:'center',
+						width:70,
+						height:70,
+						backgroundColor:'#fff',
+						borderRadius:50,
+					}}
+					onPress={takePicture}
+				>
+					<Icon name={"chevron-right"}  size={30} color="#01a699" />
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>

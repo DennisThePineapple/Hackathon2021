@@ -7,11 +7,11 @@ import {RouteProp} from "@react-navigation/native";
 import * as Styles from "../Scan/Scan.styles";
 import Colours from "../../Theme/Colours";
 import ImageSummaryData from "../../Types/ImageSummaryData";
-import {Modal} from "react-native-paper";
+import {Button, Modal, Portal, Provider} from "react-native-paper";
 import MaterialBox from "../../Types/MaterialBox";
 import {TakePictureResponse} from "react-native-camera";
 import {useUser} from "../../Context/AppContext";
-import {recyclable} from "../../Utils/Points";
+import {recyclable, waste} from "../../Utils/Points";
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -66,15 +66,41 @@ const ScanSummary: (route: RouteProp<{ params: { imageUri: string, image: string
 						<Text>{boxData.class}</Text>
 					</View>
 				}) : <View/>;
-
-
-
-
-	}
+		}
+	const [visible, setVisible] = React.useState(true);
+	const showModal = () => setVisible(true);
+	const hideModal = () => setVisible(false);
 	const renderModal = () => {
-	}
+		if (!imageData){
+			return (
+				<View/>
+			)
+		}
+		const containerStyle = {backgroundColor: 'white', padding: 20};
+		return (
+			<Provider>
+				<Portal>
+					<Modal visible={visible} contentContainerStyle={containerStyle}>
+						<Text>Recyclables:</Text>
+						{recyclable.map(material =>
+							imageData.material_score_breakdown[material]? <Text>{imageData.material_score_breakdown[material].occurrence} {material} Found: {imageData.material_score_breakdown[material].points} Points</Text>
+								: <Text>No {material} Found : 0 Points</Text>
+						)}
+						<Text>Waste:</Text>
+						{waste.map(material =>
+							imageData.material_score_breakdown[material]? <Text>{imageData.material_score_breakdown[material].occurrence} {material} Found: {imageData.material_score_breakdown[material].points} Points</Text>
+								: <Text>No {material} Found : 0 Points</Text>
+						)}
+						<Text>Total Points: {imageData.total_points}</Text>
+						<Button style={{marginTop: 5, bottom: 0}} onPress={hideModal}>
+							Sheesh.
+						</Button>
+					</Modal>
+				</Portal>
 
-
+			</Provider>
+		);
+	};
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
@@ -85,8 +111,15 @@ const ScanSummary: (route: RouteProp<{ params: { imageUri: string, image: string
 						<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.secondary} />
 					</Styles.BackButton>
 				</Styles.BackContainer>
+				<Button style={{position: 'absolute', bottom: 20,
+					left: 0, right: 0, backgroundColor: 'blue',
+					zIndex:100, width: 200,
+					marginLeft: 'auto', marginRight: 'auto'}} onPress={showModal}>
+					<Text style={{color:'white'}}>Show Summary</Text>
+				</Button>
 			</View>
 			{renderBoxes()}
+			{renderModal()}
 		</SafeAreaView>
 	);
 };

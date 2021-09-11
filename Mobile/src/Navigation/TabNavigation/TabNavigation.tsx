@@ -23,11 +23,6 @@ const TabNavigation: FC = () => {
 				headerTitleStyle: { fontFamily: fontHeaderFamily, fontSize: 30 },
 				// headerStatusBarHeight: Responsive.h(8),
 				headerBackground: () => <Fragment />,
-				headerRight: () => (
-					<View>
-						<Text>Bruh</Text>
-					</View>
-				),
 			}}
 		>
 			<Tab.Screen name="Leaderboard" component={Home} />

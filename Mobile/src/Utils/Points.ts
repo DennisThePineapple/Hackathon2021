@@ -4,7 +4,7 @@ import Materials from "../Types/Materials";
 import Userscore from "../Types/Userscore";
 
 export const recyclable = ["paper", "metal", "cardboard", "glass"]
-const waster = ["plastic", "organic", "waste"]
+export const waste = ["plastic", "organic", "waste"]
 
 export function getWastePoints(materials : Materials) {
     let points = 0;

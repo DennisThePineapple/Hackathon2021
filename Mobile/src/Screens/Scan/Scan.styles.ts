@@ -13,4 +13,5 @@ export const BackButton = styled.TouchableOpacity`
 	padding: 10px;
 	border-radius: 100px;
 	background-color: ${Colours.primary};
+    z-index: 100;
 `;
