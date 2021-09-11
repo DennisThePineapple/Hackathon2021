@@ -1,8 +1,6 @@
-from fastapi import APIRouter, FastAPI, File, Form, UploadFile
+from fastapi import APIRouter, File, Form, UploadFile
 
 import datetime
-
-from pydantic import BaseModel
 
 # Firebase
 import firebase_admin
@@ -123,4 +121,7 @@ async def leaderboards(past_days=7):
             leaderboards[username]['materials'][material]['occurrence'] = 1
             leaderboards[username]['total'] += points
 
-    return leaderboards
+    sorted_leaderboards = sorted(
+        leaderboards.items(), key=lambda x: x[1]['total'], reverse=True)
+
+    return sorted_leaderboards
