@@ -7,7 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Colours from 'Theme/Colours';
 import { BodyFont } from 'Theme/Fonts';
 import { Full } from 'Theme/Global';
+import InfoObjects from './Info.constants';
 import * as Styles from './Info.styles';
+
+const capitalizeFirstLetter = (string: string): string => {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 const Info: FC = () => {
 	const navigation = useNavigation<InfoNavProps>();
@@ -19,11 +24,9 @@ const Info: FC = () => {
 				<Styles.BackButton onPress={() => navigation.goBack()}>
 					<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.accent} />
 				</Styles.BackButton>
-				<Styles.Title colour={Colours.accent}>{route.params.material}</Styles.Title>
+				<Styles.Title colour={Colours.accent}>{capitalizeFirstLetter(route.params.material)}</Styles.Title>
 			</Styles.TitleContainer>
-			<Styles.BodyContainer>
-				<BodyFont>Put shiz in here</BodyFont>
-			</Styles.BodyContainer>
+			<Styles.BodyContainer>{InfoObjects[route.params.material]}</Styles.BodyContainer>
 		</SafeAreaView>
 	);
 };

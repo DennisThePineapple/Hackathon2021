@@ -10,8 +10,10 @@ import { useUser } from '../../Context/AppContext';
 import API from 'API/API';
 import { Full } from 'Theme/Global';
 import { Snack } from 'Components/Snack/Snack';
-import { MaterialType, Submission } from 'API/Responses';
+import { Material, MaterialType, Submission } from 'API/Responses';
 import { BodyFont } from 'Theme/Fonts';
+import { TabelRow, TableCell } from 'Components/Table/Table.styles';
+import ConfettiCannon from 'react-native-confetti-cannon';
 // import Materials from 'Types/Materials';
 
 const screenWidth = Dimensions.get('screen').width;
@@ -28,8 +30,10 @@ const colourMap: Record<MaterialType, string> = {
 };
 
 const Scan: FC = () => {
-	const navigation = useNavigation<ScanNavProps>();
 	const cameraRef = useRef<RNCamera>(null);
+	const confettiRef = useRef<ConfettiCannon>(null);
+
+	const navigation = useNavigation<ScanNavProps>();
 	const [user] = useUser();
 	const [loading, setLoading] = useState(false);
 	const [uri, setUri] = useState<string>();
@@ -46,6 +50,7 @@ const Scan: FC = () => {
 				const _result = await API.submit(data.uri, user.uid, user.displayName);
 				setResult(_result);
 				setModalVisible(true);
+				confettiRef.current?.start();
 			} catch (error) {
 				Snack.error('There was an issue with scaning your trash mate');
 			}
@@ -94,19 +99,56 @@ const Scan: FC = () => {
 				</Fragment>
 			))}
 			<View style={Full}>
-				<Styles.BackContainer>
-					<Styles.BackButton onPress={() => navigation.goBack()}>
-						<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.secondary} />
-					</Styles.BackButton>
-				</Styles.BackContainer>
+				{!modalVisible && (
+					<Styles.BackContainer>
+						<Styles.BackButton onPress={() => navigation.goBack()}>
+							<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.secondary} />
+						</Styles.BackButton>
+					</Styles.BackContainer>
+				)}
 				{helpVisible && (
 					<Styles.HelpTextContainer>
-						<BodyFont>Tap on an itme to learn more!</BodyFont>
+						<BodyFont>Tap on an item to learn more!</BodyFont>
 					</Styles.HelpTextContainer>
 				)}
 				<Modal animationType="slide" transparent={true} visible={modalVisible}>
 					<Styles.ModalContainer>
 						<Styles.Modal>
+							<Styles.TableContainer>
+								<TabelRow header>
+									<TableCell flex={2}>
+										<BodyFont colour={Colours.primary}>Material</BodyFont>
+									</TableCell>
+									<TableCell flex={1} align="center">
+										<BodyFont colour={Colours.primary}>Score</BodyFont>
+									</TableCell>
+								</TabelRow>
+								{result &&
+									Object.entries(result.breakdown).map(
+										([material, values]: [string, Material | null]) => {
+											return (
+												values && (
+													<TabelRow key={material}>
+														<TableCell flex={2}>
+															<BodyFont>{material}</BodyFont>
+														</TableCell>
+														<TableCell flex={1} align="center">
+															<BodyFont>{values.points}</BodyFont>
+														</TableCell>
+													</TabelRow>
+												)
+											);
+										},
+									)}
+								<TabelRow>
+									<TableCell flex={2}>
+										<BodyFont>TOTAL</BodyFont>
+									</TableCell>
+									<TableCell flex={1} align="center">
+										<BodyFont>{result?.total}</BodyFont>
+									</TableCell>
+								</TabelRow>
+							</Styles.TableContainer>
 							<Styles.ModalButton
 								colour={Colours.secondary}
 								onPress={() => {
@@ -122,6 +164,7 @@ const Scan: FC = () => {
 						</Styles.Modal>
 					</Styles.ModalContainer>
 				</Modal>
+				<ConfettiCannon ref={confettiRef} count={200} origin={{ x: -10, y: 0 }} autoStart={false} />
 			</View>
 		</SafeAreaView>
 	);

@@ -46,6 +46,7 @@ interface BoundingBoxProps {
 
 export const BoundingBox = styled.TouchableOpacity<BoundingBoxProps>`
 	position: absolute;
+	z-index: 999;
 	border-color: ${({ colour }) => colour};
 	border-radius: 0px 10px 10px 10px;
 	border-width: 3px;
@@ -112,4 +113,8 @@ export const HelpTextContainer = styled.View`
 	border-color: ${Colours.accent};
 	justify-content: center;
 	align-items: center;
+`;
+
+export const TableContainer = styled.View`
+	margin-bottom: 20px;
 `;
