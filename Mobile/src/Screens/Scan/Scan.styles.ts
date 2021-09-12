@@ -73,3 +73,43 @@ export const BoundingBoxLabel = styled.View<BoundingBoxLabelProps>`
 export const BoundingBoxFont = styled(SubFont)`
 	font-size: 10px;
 `;
+
+export const ModalContainer = styled.View`
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+`;
+
+export const Modal = styled.View`
+	width: 80%;
+	padding: 10px;
+	background-color: ${Colours.primary};
+	border-radius: 15px;
+	border-width: 2px;
+	border-color: ${Colours.accent};
+`;
+
+interface ModalButtonProps {
+	colour: string;
+}
+
+export const ModalButton = styled.TouchableOpacity<ModalButtonProps>`
+	margin: 5px;
+	padding: 10px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${({ colour }) => colour};
+	border-radius: 100px;
+`;
+
+export const HelpTextContainer = styled.View`
+	margin: 20px;
+	padding: 10px;
+	margin-top: auto;
+	background-color: ${Colours.primary};
+	border-radius: 15px;
+	border-width: 2px;
+	border-color: ${Colours.accent};
+	justify-content: center;
+	align-items: center;
+`;

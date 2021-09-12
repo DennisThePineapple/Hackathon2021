@@ -1,18 +1,10 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppParams } from './AppNavigation.params';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, TouchableOpacity } from 'react-native';
-import { useUser } from 'Context/AppContext';
-import Auth from 'Reducers/AuthReducer';
 import Scan from 'Screens/Scan/Scan';
-import Profile from 'Screens/Profile/Profile';
-import Home from 'Screens/Home/Home';
 import TabNavigation from 'Navigation/TabNavigation/TabNavigation';
-import ScanSummary from "../../Screens/ScanSummary/ScanSummary";
-
-// const Tab = createBottomTabNavigator<AppParams>();
+import Info from 'Screens/Info/Info';
+import { fontHeaderFamily } from 'Theme/Fonts';
 
 const AppStack = createNativeStackNavigator<AppParams>();
 
@@ -21,9 +13,18 @@ const AppNavigation: FC = () => {
 		<AppStack.Navigator screenOptions={{ headerShown: false, presentation: 'fullScreenModal' }}>
 			<AppStack.Screen name="Tabs" component={TabNavigation} />
 			<AppStack.Screen name="Scan" component={Scan} />
-			<AppStack.Screen name="Scan Summary"
-							 component={ScanSummary}
-							 initialParams={{ imageUri: "" }}
+			<AppStack.Screen
+				name="Info"
+				component={Info}
+				// options={{
+				// 	headerShown: true,
+				// 	headerTitleAlign: 'left',
+				// 	headerTitleStyle: { fontFamily: fontHeaderFamily, fontSize: 26 },
+				// 	// headerB
+				// 	// he: 60,
+				// 	// headerBackground: () => <Fragment />,
+				// 	// headerRight: () => <LogoutButton />,
+				// }}
 			/>
 		</AppStack.Navigator>
 	);

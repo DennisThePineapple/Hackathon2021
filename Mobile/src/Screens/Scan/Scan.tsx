@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/core';
 import Icon from 'Components/Icon/Icon';
 import { ScanNavProps } from 'Navigation/AppNavigation/AppNavigation.params';
 import React, { FC, Fragment, useCallback, useRef, useState } from 'react';
-import { Dimensions, Image, SafeAreaView, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, Modal, SafeAreaView, StyleSheet, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Colours from 'Theme/Colours';
 import * as Styles from './Scan.styles';
@@ -11,6 +11,7 @@ import API from 'API/API';
 import { Full } from 'Theme/Global';
 import { Snack } from 'Components/Snack/Snack';
 import { MaterialType, Submission } from 'API/Responses';
+import { BodyFont } from 'Theme/Fonts';
 // import Materials from 'Types/Materials';
 
 const screenWidth = Dimensions.get('screen').width;
@@ -34,6 +35,9 @@ const Scan: FC = () => {
 	const [uri, setUri] = useState<string>();
 	const [result, setResult] = useState<Submission>();
 
+	const [modalVisible, setModalVisible] = useState(false);
+	const [helpVisible, setHelpVisible] = useState(false);
+
 	const capture = useCallback(async () => {
 		if (user && cameraRef.current) {
 			try {
@@ -41,6 +45,7 @@ const Scan: FC = () => {
 				setUri(data.uri);
 				const _result = await API.submit(data.uri, user.uid, user.displayName);
 				setResult(_result);
+				setModalVisible(true);
 			} catch (error) {
 				Snack.error('There was an issue with scaning your trash mate');
 			}
@@ -78,6 +83,7 @@ const Scan: FC = () => {
 						bottom={screenHeight - screenHeight * box.y2}
 						left={screenWidth * box.x1}
 						right={screenWidth - screenWidth * box.x2}
+						onPress={() => navigation.navigate('Info', { material: box.material })}
 					>
 						<Styles.BoundingBoxLabel colour={colourMap[box.material]}>
 							<Styles.BoundingBoxFont>
@@ -87,12 +93,35 @@ const Scan: FC = () => {
 					</Styles.BoundingBox>
 				</Fragment>
 			))}
-			<View>
+			<View style={Full}>
 				<Styles.BackContainer>
 					<Styles.BackButton onPress={() => navigation.goBack()}>
 						<Icon family="feather" name={'chevron-left'} size={35} colour={Colours.secondary} />
 					</Styles.BackButton>
 				</Styles.BackContainer>
+				{helpVisible && (
+					<Styles.HelpTextContainer>
+						<BodyFont>Tap on an itme to learn more!</BodyFont>
+					</Styles.HelpTextContainer>
+				)}
+				<Modal animationType="slide" transparent={true} visible={modalVisible}>
+					<Styles.ModalContainer>
+						<Styles.Modal>
+							<Styles.ModalButton
+								colour={Colours.secondary}
+								onPress={() => {
+									setModalVisible(false);
+									setHelpVisible(true);
+								}}
+							>
+								<BodyFont>Get Help Recycling</BodyFont>
+							</Styles.ModalButton>
+							<Styles.ModalButton colour={Colours.accent} onPress={() => navigation.navigate('Tabs')}>
+								<BodyFont colour={Colours.primary}>Continue</BodyFont>
+							</Styles.ModalButton>
+						</Styles.Modal>
+					</Styles.ModalContainer>
+				</Modal>
 			</View>
 		</SafeAreaView>
 	);
